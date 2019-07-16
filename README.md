@@ -2,7 +2,13 @@
 Livesplit Autosplitter/Load Remover for Titanfall 2
 
 # Instructions for installing
-Deactivate your old autosplitter if you have one, then right click on livesplit and go to edit layout
-then click the plus and goto control > scriptable auto splitter
-then click on layout settings and at the top goto scriptable auto splitter and select the autosplitter file as the file path
-then you should be good
+
+1. Deactivate your old autosplitter if you have one
+
+2. Right click on livesplit and go to edit layout
+
+3. Click the plus and goto control > scriptable auto splitter
+
+4. Click on layout settings and at the top goto scriptable auto splitter
+
+5. Select the autosplitter file as the file path
