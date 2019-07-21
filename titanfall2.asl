@@ -21,11 +21,57 @@ startup {
 
 init {
 	vars.gameEnded = false;
+	vars.resetLock = false;
+	vars.wishReset = false;
 }
 
 start {
 	if (old.clframes <= 0 && current.clframes > 0) {
-		return true;
+		//Pilots Gauntlet
+		if (current.level == "sp_training" && old.x > 10600 && old.x < 10700 && old.z > -10300 && old.z < -10100)
+			return true;
+		//BT-7274
+		if (current.level == "sp_crashsite" && old.x > 0 && old.x < 100 && old.z > 200 && old.z < 300)
+			return true;
+		//Blood and Rust
+		if (current.level == "sp_sewers1" && old.x > 9000 && old.x < 9100 && old.z > -14500 && old.z < -14300)
+			return true;
+		//ITA 1
+		if (current.level == "sp_boomtown_start" && old.x > 13500 && old.x < 13700 && old.z > -8900 && old.z < -8700)
+			return true;
+		//ITA 2
+		if (current.level == "sp_boomtown" && old.x > -4100 && old.x < -4000 && old.z > 11100 && old.z < 11300)
+			return true;
+		//ITA 3
+		if (current.level == "sp_boomtown_end" && old.x > -15100 && old.x < -14900 && old.z > -5300 && old.z < -5100)
+			return true;
+		//E&C 1
+		if (current.level == "sp_hub_timeshift" && old.x > 900 && old.x < 1100 && old.z > -7200 && old.z < -7000)
+			return true;
+		//E&C 2
+		if (current.level == "sp_timeshift_spoke02" && old.x > -800 && old.x < -600 && old.z > -3400 && old.z < -3300)
+			return true;
+		//E&C 3
+		if (current.level == "sp_hub_timeshift" && old.x > 1000 && old.x < 1100 && old.z > -7000 && old.z < -7200)
+			return true;
+		//Beacon 1
+		if (current.level == "sp_beacon" && old.x > 14200 && old.x < 14400 && old.z > -10900 && old.z < -10800)
+			return true;
+		//Beacon 2
+		if (current.level == "sp_beacon_spoke0" && old.x > -1150 && old.x < -1000 && old.z > -400 && old.z < -200)
+			return true;
+		//Beacon 3
+		if (current.level == "sp_beacon" && old.x > 14200 && old.x < 14400 && old.z > 700 && old.z < 800)
+			return true;
+		//TBF
+		if (current.level == "sp_tday" && old.x > 500 && old.x < 700 && old.z > -15600 && old.z < -15500)
+			return true;
+		//The Ark
+		if (current.level == "sp_s2s" && old.x > -100 && old.x < 100 && old.z > 4000 && old.z < 4200)
+			return true;
+		//The Fold Weapon
+		if (current.level == "sp_skyway_v1" && old.x > -11600 && old.x < -11400 && old.z > -7200 && old.z < -7100)
+			return true;
 	}
 }
 
@@ -44,9 +90,22 @@ split {
 	}
 }
 
-reset {
+update {
 	// Reset if you're at the location at the beginning of the game, are on the sp_training map, and the game is not rendering anything
 	if (current.clframes <= 0 && current.level == "sp_training" && current.x == 10664 && current.y == -6056 && current.z == -10200) {
+		if (!vars.resetLock) {
+			vars.wishReset = true;
+			vars.resetLock = true;
+		} else {
+			vars.wishReset = false;
+		}
+	} else {
+		vars.resetLock = false;
+	}
+}
+
+reset {
+	if (vars.wishReset) {
 		return true;
 	}
 }
