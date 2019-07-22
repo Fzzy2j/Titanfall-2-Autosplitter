@@ -49,10 +49,12 @@ init {
 	
 	vars.dialogueSplitTimer = -1;
 	
+	vars.arkElevatorSplitTimer = -1;
+	
 	vars.module1Split = false;
 	vars.module2Split = false;
 	
-	vars.datacoreSplit = false;
+	vars.datacoreSplitTimer = -1;
 	vars.escapeSplit = false;
 }
 
@@ -123,7 +125,7 @@ split {
 	//Batteries on BT
 	if (current.level == "sp_crashsite" && settings["batterySplit"]) {
 		//Battery 1
-		if (current.x > -4590 && current.x < -4560 && current.y > 2100 && current.y < 2200 && current.z > -3670 && current.z < -3650) {
+		if (current.x > -4598 && current.x < -4590 && current.y > 2110 && current.y < 2140 && current.z > -3650 && current.z < -3640) {
 			if (!vars.battery1Split) {
 				vars.battery1Split = true;
 				return true;
@@ -132,7 +134,7 @@ split {
 			vars.battery1Split = false;
 			
 		//Battery 2
-		if (current.x > -4120 && current.x < -4108 && current.y > 2320 && current.y < 2330  && current.z > 4580 && current.z < 4585) {
+		if (current.x > -4110 && current.x < -4090 && current.y > 2320 && current.y < 2335  && current.z > 4580 && current.z < 4590) {
 			if (!vars.battery2Split) {
 				vars.battery2Split = true;
 				return true;
@@ -150,7 +152,7 @@ split {
 	
 	//Helmet on E&C1
 	if (current.level == "sp_hub_timeshift" && settings["helmetSplit"]) {
-		if (current.x > 1000 && current.x < 1009 && current.y > -859 && current.y < -847 && current.z > -2720 && current.z < -2718) {
+		if (current.x > 1005 && current.x < 1011 && current.y > -850 && current.y < -847 && current.z > -2720 && current.z < -2718) {
 			if (!vars.helmetSplit) {
 				vars.helmetSplit = true;
 				return true;
@@ -179,7 +181,7 @@ split {
 	if (current.level == "sp_beacon" && settings["moduleSplit"]) {
 		
 		//Module 1
-		if (current.x > -10670 && current.x < -10658  && current.y > 2220 && current.y < 2243 && current.z > 9536 && current.z < 9540) {
+		if (current.x > -10661 && current.x < -10660  && current.y > 2224 && current.y < 2225 && current.z > 9537 && current.z < 9538) {
 			if (!vars.module1Split) {
 				vars.module1Split = true;
 				return true;
@@ -206,9 +208,20 @@ split {
 	
 	//Ark Elevator
 	if (current.level == "sp_s2s" && settings["arkElevatorSplit"]) {
-		if (old.dialogue != current.dialogue && current.dialogue == "CPT Meas: (radio) Co") {
+		print(vars.arkElevatorSplitTimer + "");
+		if (current.dialogue == "CPT Meas: (radio) Co") {
+			if (vars.arkElevatorSplitTimer == -1) {
+				vars.arkElevatorSplitTimer = Environment.TickCount;
+			}
+		}
+		
+		if (vars.arkElevatorSplitTimer > 0 && Environment.TickCount - vars.arkElevatorSplitTimer >= 1100) {
+			vars.arkElevatorSplitTimer = -2;
 			return true;
 		}
+		
+		if (current.clframes <= 0)
+			vars.arkElevatorSplitTimer = -1;
 	}
 	
 	//Ark Gates Shot
@@ -221,12 +234,16 @@ split {
 	//Fold Weapon Datacore
 	if (current.level == "sp_skyway_v1" && settings["datacoreSplit"]) {
 		if (current.x > 5293 && current.x < 5294 && current.y > 3577 && current.y < 3578 && current.z > -5749 && current.z < -5748) {
-			if (!vars.datacoreSplit) {
-				vars.datacoreSplit = true;
-				return true;
+			if (vars.datacoreSplitTimer == -1) {
+				vars.datacoreSplitTimer = Environment.TickCount;
 			}
 		} else if (current.clframes <= 0)
-			vars.datacoreSplit = false;
+			vars.datacoreSplitTimer = -1;
+			
+		if (vars.datacoreSplitTimer > 0 && Environment.TickCount - vars.datacoreSplitTimer >= 1500) {
+			vars.datacoreSplitTimer = -2;
+			return true;
+		}
 	}
 	
 	//Escape Landing
