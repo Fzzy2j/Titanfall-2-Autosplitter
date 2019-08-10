@@ -30,7 +30,7 @@ state("Titanfall2") {
 
 startup {
 	settings.Add("removeLoads", true, "Remove Loads");
-	settings.Add("ilMode", false, "Idividual Level Mode (Beacon 3 requires subtitles to be on)");
+	settings.Add("ilMode", false, "Idividual Level Mode (Beacon 3 & Ark requires subtitles to be on)");
 	
 	settings.Add("subSplits", false, "Sub Splits");
 	settings.Add("batterySplit", false, "Split on Batteries on BT-7274", "subSplits");
@@ -100,7 +100,7 @@ start {
 		if (current.level == "sp_timeshift_spoke02" && old.x > -800 && old.x < -600 && old.z > -3400 && old.z < -3300)
 			return true;
 		//E&C 3
-		if (current.level == "sp_hub_timeshift" && old.x > 1000 && old.x < 1100 && old.z > -7000 && old.z < -7200)
+		if (current.level == "sp_hub_timeshift" && ((old.x > 1000 && old.x < 1100 && old.z > -7000 && old.z < -7200) || (old.x > 1350 && old.x < 1400 && old.z < -2700 && old.z > -2750)))
 			return true;
 		//Beacon 1
 		if (current.level == "sp_beacon" && old.x > 14200 && old.x < 14400 && old.z > -10900 && old.z < -10800)
@@ -109,7 +109,7 @@ start {
 		if (current.level == "sp_beacon_spoke0" && old.x > -1150 && old.x < -1000 && old.z > -400 && old.z < -200)
 			return true;
 		//Beacon 3
-		if (current.level == "sp_beacon" && old.x > 14200 && old.x < 14400 && old.z > 700 && old.z < 800)
+		if (current.level == "sp_beacon" && ((old.x > 14200 && old.x < 14400 && old.z > -10900 && old.z < -10800) || (old.x > 12300 && old.x < 12400 && old.z > -1050 && old.z < -950)))
 			return true;
 		//TBF
 		if (current.level == "sp_tday" && old.x > 500 && old.x < 700 && old.z > -15600 && old.z < -15500)
@@ -312,14 +312,14 @@ isLoading {
 		for (int i = 0; i < current.dialogue.Length; i++) {
 			dialogueCount += current.dialogue[i];
 		}
-		if (old.dialogue != current.dialogue && dialogueCount == 96009) vars.arkIlPausePrep = true;
+		if (old.dialogue != current.dialogue && (dialogueCount == 96009 || dialogueCount == 1640)) vars.arkIlPausePrep = true;
 		if (current.level == "sp_s2s" && current.viper == 1 && old.viper == 0 && vars.arkIlPausePrep) {
 			vars.arkIlPause = true;
 			vars.arkIlPausePrep = false;
 		}
 		if (old.inCutscene == 0 && current.inCutscene == 1 && current.level == "sp_sewers1" && current.x > -9000) vars.bnrIlPause = true;
 		if (old.inCutscene == 0 && current.inCutscene == 1 && current.level == "sp_hub_timeshift" && current.z > 4000) vars.enc3IlPause = true;
-		if (dialogueCount == 104646 && current.level == "sp_beacon") vars.b3IlPause = true;
+		if ((dialogueCount == 104646 || dialogueCount == 2677) && current.level == "sp_beacon") vars.b3IlPause = true;
 		if (vars.bnrIlPause || vars.enc3IlPause || vars.b3IlPause || vars.arkIlPause) return true;
 	}
 	return loading && settings["removeLoads"];
