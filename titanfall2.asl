@@ -12,32 +12,47 @@ state("Titanfall2") {
 	float x : "client.dll", 0x2172FF8, 0xDEC;
 	float z : "client.dll", 0x2173B48, 0x2A0;
 	float y : "client.dll", 0x216F9C0, 0xF4;
+	float angle : "engine.dll", 0x7B666C;
 	float velocity : "client.dll", 0x2A9EEB8, 0x884;
+	
+	// Viper kill
+	int viper : "client.dll", 0xC0916C;
+	
+	// this = 1 when in a cutscene, it also = 2 when embarking/disembarking bt
+	int inCutscene : "engine.dll", 0x111E1B58;
 	
 	// This value increments whenever you embark, it seems to reset to 0 when a new level is loaded
 	int embarkCount : "engine.dll", 0x111E18D8;
 	
 	// Subtitle dialogue
-	string20 dialogue : "engine.dll", 0x13987B68, 0x60, 0x0;
+	string30 dialogue : "engine.dll", 0x13987B68, 0x60, 0x0;
 }
 
 startup {
 	settings.Add("removeLoads", true, "Remove Loads");
+	settings.Add("ilMode", false, "Idividual Level Mode (Beacon 3 requires subtitles to be on)");
 	
-	settings.Add("batterySplit", false, "Split on Batteries on BT-7274");
-	settings.Add("ita3TitanSplit", false, "Split on Embark on Into the Abyss 3");
-	settings.Add("helmetSplit", false, "Split on helmet grab on Effect and Cause 1");
-	settings.Add("dialogueSplit", false, "Split on dialogue on Effect and Cause 2");
-	settings.Add("moduleSplit", false, "Split on modules on Beacon 3");
-	settings.Add("tbfElevatorSplit", false, "Split on elevator on Trial by Fire (Requires subtitles to be on)");
-	settings.Add("arkElevatorSplit", false, "Split on elevator on The Ark (Requires subtitles to be on)");
-	settings.Add("arkGatesShootSplit", false, "Split when Gates shoots the glass on The Ark (Requires subtitles to be on)");
-	settings.Add("datacoreSplit", false, "Split when you insert BT's datacore on The Fold Weapon");
-	settings.Add("escapeSplit", false, "Split when first land at escape (Also works for fast any% last load)");
+	settings.Add("subSplits", false, "Sub Splits");
+	settings.Add("batterySplit", false, "Split on Batteries on BT-7274", "subSplits");
+	settings.Add("ita3TitanSplit", false, "Split on Embark on Into the Abyss 3", "subSplits");
+	settings.Add("helmetSplit", false, "Split on helmet grab on Effect and Cause 1", "subSplits");
+	settings.Add("dialogueSplit", false, "Split on dialogue on Effect and Cause 2", "subSplits");
+	settings.Add("moduleSplit", false, "Split on modules on Beacon 3", "subSplits");
+	settings.Add("tbfElevatorSplit", false, "Split on elevator on Trial by Fire (Requires subtitles to be on)", "subSplits");
+	settings.Add("arkElevatorSplit", false, "Split on elevator on The Ark (Requires subtitles to be on)", "subSplits");
+	settings.Add("arkGatesShootSplit", false, "Split when Gates shoots the glass on The Ark (Requires subtitles to be on)", "subSplits");
+	settings.Add("datacoreSplit", false, "Split when you insert BT's datacore on The Fold Weapon", "subSplits");
+	settings.Add("escapeSplit", false, "Split when first land at escape (Also works for fast any% last load)", "subSplits");
 }
 
 init {
 	vars.gameEnded = false;
+	
+	vars.bnrIlPause = false;
+	vars.enc3IlPause = false;
+	vars.b3IlPause = false;
+	vars.arkIlPause = false;
+	vars.arkIlPausePrep = false;
 	
 	vars.resetLock = false;
 	vars.wishReset = false;
@@ -109,6 +124,13 @@ start {
 }
 
 split {
+	
+	// Add up all the characters in the current dialogue (used for foreign language splits)
+	var dialogueCount = 0;
+	for (int i = 0; i < current.dialogue.Length; i++) {
+		dialogueCount += current.dialogue[i];
+	}
+	
 	// End of game
 	if (current.level == "sp_skyway_v1" && current.x < -11000 && current.z > 0 && current.velocity <= 0 && !vars.gameEnded) {
 		vars.gameEnded = true;
@@ -198,18 +220,16 @@ split {
 		} else if (current.clframes <= 0)
 			vars.module2Split = false;
 	}
-	
 	//TBF Elevator
 	if (current.level == "sp_tday" && settings["tbfElevatorSplit"]) {
-		if (old.dialogue != current.dialogue && current.dialogue == "Sarah: (radio) Here ") {
+		if (old.dialogue != current.dialogue && (current.dialogue == "Sarah: (radio) Here " || dialogueCount == 396581)) {
 			return true;
 		}
 	}
 	
 	//Ark Elevator
 	if (current.level == "sp_s2s" && settings["arkElevatorSplit"]) {
-		print(vars.arkElevatorSplitTimer + "");
-		if (current.dialogue == "CPT Meas: (radio) Co") {
+		if (current.dialogue == "CPT Meas: (radio) Co" || dialogueCount == 388777) {
 			if (vars.arkElevatorSplitTimer == -1) {
 				vars.arkElevatorSplitTimer = Environment.TickCount;
 			}
@@ -226,7 +246,7 @@ split {
 	
 	//Ark Gates Shot
 	if (current.level == "sp_s2s" && settings["arkGatesShootSplit"]) {
-		if (old.dialogue != current.dialogue && current.dialogue == "Bear: Hold your fire") {
+		if (old.dialogue != current.dialogue && (current.dialogue == "Bear: Hold your fire" || dialogueCount == 354581)) {
 			return true;
 		}
 	}
@@ -279,5 +299,28 @@ reset {
 }
 
 isLoading {
-	return (current.clframes <= 0 || current.thing == 0) && settings["removeLoads"];
+	var loading = current.clframes <= 0 || current.thing == 0;
+	if (loading) {
+		vars.bnrIlPause = false;
+		vars.enc3IlPause = false;
+		vars.b3IlPause = false;
+		vars.arkIlPause = false;
+	}
+	if (settings["ilMode"]) {
+		// Add up all the characters in the current dialogue (used for foreign language splits)
+		var dialogueCount = 0;
+		for (int i = 0; i < current.dialogue.Length; i++) {
+			dialogueCount += current.dialogue[i];
+		}
+		if (old.dialogue != current.dialogue && dialogueCount == 96009) vars.arkIlPausePrep = true;
+		if (current.level == "sp_s2s" && current.viper == 1 && old.viper == 0 && vars.arkIlPausePrep) {
+			vars.arkIlPause = true;
+			vars.arkIlPausePrep = false;
+		}
+		if (old.inCutscene == 0 && current.inCutscene == 1 && current.level == "sp_sewers1" && current.x > -9000) vars.bnrIlPause = true;
+		if (old.inCutscene == 0 && current.inCutscene == 1 && current.level == "sp_hub_timeshift" && current.z > 4000) vars.enc3IlPause = true;
+		if (dialogueCount == 104646 && current.level == "sp_beacon") vars.b3IlPause = true;
+		if (vars.bnrIlPause || vars.enc3IlPause || vars.b3IlPause || vars.arkIlPause) return true;
+	}
+	return loading && settings["removeLoads"];
 }
