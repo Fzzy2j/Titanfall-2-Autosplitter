@@ -222,14 +222,14 @@ split {
 	}
 	//TBF Elevator
 	if (current.level == "sp_tday" && settings["tbfElevatorSplit"]) {
-		if (old.dialogue != current.dialogue && (current.dialogue == "Sarah: (radio) Here " || dialogueCount == 396581)) {
+		if (old.dialogue != current.dialogue && (current.dialogue.StartsWith("Sarah: (radio) Here ") || dialogueCount == 396581)) {
 			return true;
 		}
 	}
 	
 	//Ark Elevator
 	if (current.level == "sp_s2s" && settings["arkElevatorSplit"]) {
-		if (current.dialogue == "CPT Meas: (radio) Co" || dialogueCount == 388777) {
+		if (current.dialogue.StartsWith("CPT Meas: (radio) Co") || dialogueCount == 388777) {
 			if (vars.arkElevatorSplitTimer == -1) {
 				vars.arkElevatorSplitTimer = Environment.TickCount;
 			}
@@ -246,7 +246,7 @@ split {
 	
 	//Ark Gates Shot
 	if (current.level == "sp_s2s" && settings["arkGatesShootSplit"]) {
-		if (old.dialogue != current.dialogue && (current.dialogue == "Bear: Hold your fire" || dialogueCount == 354581)) {
+		if (old.dialogue != current.dialogue && (current.dialogue.StartsWith("Bear: Hold your fire") || dialogueCount == 354581)) {
 			return true;
 		}
 	}
