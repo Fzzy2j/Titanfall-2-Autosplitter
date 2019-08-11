@@ -123,6 +123,31 @@ start {
 	}
 }
 
+update {
+	if (current.clframes <= 0) {
+		vars.battery1Split = false;
+		vars.battery2Split = false;
+	
+		vars.helmetSplit = false;
+	
+		vars.dialogueSplitTimer = -1;
+	
+		vars.arkElevatorSplitTimer = -1;
+	
+		vars.module1Split = false;
+		vars.module2Split = false;
+	
+		vars.datacoreSplitTimer = -1;
+		vars.escapeSplit = false;
+	
+		vars.bnrIlPause = false;
+		vars.enc3IlPause = false;
+		vars.b3IlPause = false;
+		vars.arkIlPause = false;
+		vars.arkIlPausePrep = false;
+	}
+}
+
 split {
 	
 	// Add up all the characters in the current dialogue (used for foreign language splits)
