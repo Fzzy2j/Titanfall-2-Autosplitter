@@ -33,16 +33,16 @@ startup {
 	settings.Add("ilMode", false, "Idividual Level Mode (Beacon 3 & Ark requires subtitles to be on)");
 	
 	settings.Add("subSplits", false, "Sub Splits");
-	settings.Add("batterySplit", false, "Split on Batteries on BT-7274", "subSplits");
-	settings.Add("ita3TitanSplit", false, "Split on Embark on Into the Abyss 3", "subSplits");
-	settings.Add("helmetSplit", false, "Split on helmet grab on Effect and Cause 1", "subSplits");
-	settings.Add("dialogueSplit", false, "Split on dialogue on Effect and Cause 2", "subSplits");
-	settings.Add("moduleSplit", false, "Split on modules on Beacon 3", "subSplits");
-	settings.Add("tbfElevatorSplit", false, "Split on elevator on Trial by Fire (Requires subtitles to be on)", "subSplits");
-	settings.Add("arkElevatorSplit", false, "Split on elevator on The Ark (Requires subtitles to be on)", "subSplits");
-	settings.Add("arkGatesShootSplit", false, "Split when Gates shoots the glass on The Ark (Requires subtitles to be on)", "subSplits");
-	settings.Add("datacoreSplit", false, "Split when you insert BT's datacore on The Fold Weapon", "subSplits");
-	settings.Add("escapeSplit", false, "Split when first land at escape (Also works for fast any% last load)", "subSplits");
+	settings.Add("batterySplit", true, "Split on Batteries on BT-7274", "subSplits");
+	settings.Add("ita3TitanSplit", true, "Split on Embark on Into the Abyss 3", "subSplits");
+	settings.Add("helmetSplit", true, "Split on helmet grab on Effect and Cause 1", "subSplits");
+	settings.Add("dialogueSplit", true, "Split on dialogue on Effect and Cause 2", "subSplits");
+	settings.Add("moduleSplit", true, "Split on modules on Beacon 3", "subSplits");
+	settings.Add("tbfElevatorSplit", true, "Split on elevator on Trial by Fire (Requires subtitles to be on)", "subSplits");
+	settings.Add("arkElevatorSplit", true, "Split on elevator on The Ark (Requires subtitles to be on)", "subSplits");
+	settings.Add("arkGatesShootSplit", true, "Split when Gates shoots the glass on The Ark (Requires subtitles to be on)", "subSplits");
+	settings.Add("datacoreSplit", true, "Split when you insert BT's datacore on The Fold Weapon", "subSplits");
+	settings.Add("escapeSplit", true, "Split when first land at escape (Also works for fast any% last load)", "subSplits");
 }
 
 init {
