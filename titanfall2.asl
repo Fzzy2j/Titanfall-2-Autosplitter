@@ -333,7 +333,9 @@ split {
 	//Beacon 2 button
 	if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
 		if (old.button == 1 && current.button == 0) {
-			return true;
+			if (old.x > 2350 && current.x < 3000 && current.z > 10200 && current.z < 10550 && current.y > 1110) {
+				return true;
+			}
 		}
 	}
 	
