@@ -322,7 +322,7 @@ split {
 	}
 	
 	//Beacon 2 warp
-	if (current.level == "sp_beacon_spoke0" && settings["ilMode"]) {
+	if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
 		if (current.x > 1100 && current.x < 2000 && current.z > 4300 && current.z < 4600) {
 			if (current.death != 0 && old.death == 0) {
 				return true;
@@ -331,14 +331,14 @@ split {
 	}
 	
 	//Beacon 2 button
-	if (current.level == "sp_beacon_spoke0" && settings["ilMode"]) {
+	if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
 		if (old.button == 1 && current.button == 0) {
 			return true;
 		}
 	}
 	
 	//Beacon 2 heatsink trigger
-	if (current.level == "sp_beacon_spoke0" && settings["ilMode"]) {
+	if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
 		if (old.x > -2113 && current.x <= -2113 && current.z < 11800 && current.z > 10100) {
 			return true;
 		}
