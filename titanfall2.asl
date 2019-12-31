@@ -8,6 +8,12 @@ state("Titanfall2") {
 	// This is the last loaded level
 	string20 level : "engine.dll", 0x13536498, 0x2C;
 	
+	// This number changes to be not 0 when the player is dead
+	int death : "client.dll", 0x02D57D28, 0x328, 0xB8, 0xC0;
+	
+	// Beacon 2 button
+	int button : "client.dll", 0x02E55DC0, 0x0, 0x5908, 0xF4;
+	
 	// Current player position and velocity
 	float x : "client.dll", 0x2172FF8, 0xDEC;
 	float z : "client.dll", 0x2173B48, 0x2A0;
@@ -30,19 +36,22 @@ state("Titanfall2") {
 
 startup {
 	settings.Add("removeLoads", true, "Remove Loads");
-	settings.Add("ilMode", false, "Idividual Level Mode (Beacon 3 & Ark requires subtitles to be on)");
+	settings.Add("BnRpause", false, "Blood and Rust IL pause");
+	settings.Add("enc3pause", false, "Effect and Cause 3 IL pause");
+	settings.Add("Arkpause", false, "The Ark IL pause");
+	settings.Add("b2splits", false, "Beacon 2 subsplits");
 	
 	settings.Add("subSplits", false, "Sub Splits");
-	settings.Add("batterySplit", true, "Split on Batteries on BT-7274", "subSplits");
-	settings.Add("ita3TitanSplit", true, "Split on Embark on Into the Abyss 3", "subSplits");
-	settings.Add("helmetSplit", true, "Split on helmet grab on Effect and Cause 1", "subSplits");
-	settings.Add("dialogueSplit", true, "Split on dialogue on Effect and Cause 2", "subSplits");
-	settings.Add("moduleSplit", true, "Split on modules on Beacon 3", "subSplits");
-	settings.Add("tbfElevatorSplit", true, "Split on elevator on Trial by Fire (Requires subtitles to be on)", "subSplits");
-	settings.Add("arkElevatorSplit", true, "Split on elevator on The Ark (Requires subtitles to be on)", "subSplits");
-	settings.Add("arkGatesShootSplit", true, "Split when Gates shoots the glass on The Ark (Requires subtitles to be on)", "subSplits");
-	settings.Add("datacoreSplit", true, "Split when you insert BT's datacore on The Fold Weapon", "subSplits");
-	settings.Add("escapeSplit", true, "Split when first land at escape (Also works for fast any% last load)", "subSplits");
+	settings.Add("batterySplit", false, "Split on Batteries on BT-7274", "subSplits");
+	settings.Add("ita3TitanSplit", false, "Split on Embark on Into the Abyss 3", "subSplits");
+	settings.Add("helmetSplit", false, "Split on helmet grab on Effect and Cause 1", "subSplits");
+	settings.Add("dialogueSplit", false, "Split on dialogue on Effect and Cause 2", "subSplits");
+	settings.Add("moduleSplit", false, "Split on modules on Beacon 3", "subSplits");
+	settings.Add("tbfElevatorSplit", false, "Split on elevator on Trial by Fire (Requires subtitles to be on)", "subSplits");
+	settings.Add("arkElevatorSplit", false, "Split on elevator on The Ark (Requires subtitles to be on)", "subSplits");
+	settings.Add("arkGatesShootSplit", false, "Split when Gates shoots the glass on The Ark (Requires subtitles to be on)", "subSplits");
+	settings.Add("datacoreSplit", false, "Split when you insert BT's datacore on The Fold Weapon", "subSplits");
+	settings.Add("escapeSplit", false, "Split when first land at escape (Also works for fast any% last load)", "subSplits");
 }
 
 init {
@@ -124,6 +133,18 @@ start {
 }
 
 update {
+	// Reset if you're at the location at the beginning of the game, are on the sp_training map, and the game is not rendering anything
+	if (current.clframes <= 0 && current.level == "sp_training" && current.x == 10664 && current.y == -6056 && current.z == -10200) {
+		if (!vars.resetLock) {
+			vars.wishReset = true;
+			vars.resetLock = true;
+		} else {
+			vars.wishReset = false;
+		}
+	} else {
+		vars.resetLock = false;
+	}
+	
 	if (current.clframes <= 0) {
 		vars.battery1Split = false;
 		vars.battery2Split = false;
@@ -142,14 +163,12 @@ update {
 	
 		vars.bnrIlPause = false;
 		vars.enc3IlPause = false;
-		vars.b3IlPause = false;
 		vars.arkIlPause = false;
 		vars.arkIlPausePrep = false;
 	}
 }
 
 split {
-	
 	// Add up all the characters in the current dialogue (used for foreign language splits)
 	var dialogueCount = 0;
 	for (int i = 0; i < current.dialogue.Length; i++) {
@@ -301,19 +320,28 @@ split {
 		} else if (current.clframes <= 0)
 			vars.escapeSplit = false;
 	}
-}
-
-update {
-	// Reset if you're at the location at the beginning of the game, are on the sp_training map, and the game is not rendering anything
-	if (current.clframes <= 0 && current.level == "sp_training" && current.x == 10664 && current.y == -6056 && current.z == -10200) {
-		if (!vars.resetLock) {
-			vars.wishReset = true;
-			vars.resetLock = true;
-		} else {
-			vars.wishReset = false;
+	
+	//Beacon 2 warp
+	if (current.level == "sp_beacon_spoke0" && settings["ilMode"]) {
+		if (current.x > 1100 && current.x < 2000 && current.z > 4300 && current.z < 4600) {
+			if (current.death != 0 && old.death == 0) {
+				return true;
+			}
 		}
-	} else {
-		vars.resetLock = false;
+	}
+	
+	//Beacon 2 button
+	if (current.level == "sp_beacon_spoke0" && settings["ilMode"]) {
+		if (old.button == 1 && current.button == 0) {
+			return true;
+		}
+	}
+	
+	//Beacon 2 heatsink trigger
+	if (current.level == "sp_beacon_spoke0" && settings["ilMode"]) {
+		if (old.x > -2113 && current.x <= -2113 && current.z < 11800 && current.z > 10100) {
+			return true;
+		}
 	}
 }
 
@@ -328,10 +356,13 @@ isLoading {
 	if (loading) {
 		vars.bnrIlPause = false;
 		vars.enc3IlPause = false;
-		vars.b3IlPause = false;
 		vars.arkIlPause = false;
 	}
-	if (settings["ilMode"]) {
+	if (settings["BnRpause"]) {
+		if (old.inCutscene == 0 && current.inCutscene == 1 && current.level == "sp_sewers1" && current.x > -9000) vars.bnrIlPause = true;
+		if (vars.bnrIlPause) return true;
+	}
+	if (settings["Arkpause"]) {
 		// Add up all the characters in the current dialogue (used for foreign language splits)
 		var dialogueCount = 0;
 		for (int i = 0; i < current.dialogue.Length; i++) {
@@ -342,10 +373,11 @@ isLoading {
 			vars.arkIlPause = true;
 			vars.arkIlPausePrep = false;
 		}
-		if (old.inCutscene == 0 && current.inCutscene == 1 && current.level == "sp_sewers1" && current.x > -9000) vars.bnrIlPause = true;
-		if (old.inCutscene == 0 && current.inCutscene == 1 && current.level == "sp_hub_timeshift" && current.z > 4000) vars.enc3IlPause = true;
-		if ((dialogueCount == 104646 || dialogueCount == 2677) && current.level == "sp_beacon") vars.b3IlPause = true;
-		if (vars.bnrIlPause || vars.enc3IlPause || vars.b3IlPause || vars.arkIlPause) return true;
+		if (vars.arkIlPause) return true;
 	}
-	return loading && settings["removeLoads"];
+	if (settings["enc3pause"]) {
+		if (old.inCutscene == 0 && current.inCutscene == 1 && current.level == "sp_hub_timeshift" && current.z > 4000) vars.enc3IlPause = true;
+		if (vars.enc3IlPause) return true;
+	}
+	return loading;
 }
