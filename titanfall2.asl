@@ -171,8 +171,10 @@ update {
 split {
 	// Add up all the characters in the current dialogue (used for foreign language splits)
 	var dialogueCount = 0;
-	for (int i = 0; i < current.dialogue.Length; i++) {
-		dialogueCount += current.dialogue[i];
+	if (current.dialogue != null) {
+		for (int i = 0; i < current.dialogue.Length; i++) {
+			dialogueCount += current.dialogue[i];
+		}
 	}
 	
 	// End of game
@@ -367,8 +369,10 @@ isLoading {
 	if (settings["Arkpause"]) {
 		// Add up all the characters in the current dialogue (used for foreign language splits)
 		var dialogueCount = 0;
-		for (int i = 0; i < current.dialogue.Length; i++) {
-			dialogueCount += current.dialogue[i];
+		if (current.dialogue != null) {
+			for (int i = 0; i < current.dialogue.Length; i++) {
+				dialogueCount += current.dialogue[i];
+			}
 		}
 		if (old.dialogue != current.dialogue && (dialogueCount == 96009 || dialogueCount == 1640)) vars.arkIlPausePrep = true;
 		if (current.level == "sp_s2s" && current.viper == 1 && old.viper == 0 && vars.arkIlPausePrep) {
