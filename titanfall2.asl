@@ -40,6 +40,7 @@ startup {
 	settings.Add("enc3pause", false, "Effect and Cause 3 IL pause");
 	settings.Add("Arkpause", false, "The Ark IL pause");
 	settings.Add("b2splits", false, "Beacon 2 subsplits");
+	settings.Add("speedmodMode", false, "Speedmod Mode");
 	
 	settings.Add("subSplits", false, "Sub Splits");
 	settings.Add("batterySplit", false, "Split on Batteries on BT-7274", "subSplits");
@@ -187,11 +188,12 @@ split {
 	
 	//Level change
 	if (current.level != old.level) {
+		if (current.level == "sp_s2s" && settings["speedmodMode"]) return false;
 		return true;
 	}
 	
 	//Batteries on BT
-	if (current.level == "sp_crashsite" && settings["batterySplit"]) {
+	if (current.level == "sp_crashsite" && (settings["batterySplit"] || settings["speedmodMode"])) {
 		//Battery 1
 		if (current.x > -4598 && current.x < -4590 && current.y > 2110 && current.y < 2140 && current.z > -3650 && current.z < -3640) {
 			if (!vars.battery1Split) {
@@ -223,6 +225,16 @@ split {
 		if (current.x > 1005 && current.x < 1011 && current.y > -850 && current.y < -847 && current.z > -2720 && current.z < -2718) {
 			if (!vars.helmetSplit) {
 				vars.helmetSplit = true;
+				
+				System.Diagnostics.Process[] tf2Processes = System.Diagnostics.Process.GetProcessesByName("Titanfall2");
+				if (tf2Processes.Length > 0)
+				{
+					print("process found!");
+					System.Diagnostics.Process process = tf2Processes[0];
+					System.IntPtr h = process.MainWindowHandle;
+					System.Windows.Forms.SendKeys.Send("`");
+				}
+				
 				return true;
 			}
 		} else if (current.clframes <= 0)
@@ -231,7 +243,7 @@ split {
 	
 	//E&C 2 Dialogue
 	//Waits 3 seconds after cutscene starts (thanks for making it more complicated than it had to be bry ;])
-	if (current.level == "sp_timeshift_spoke02" && settings["dialogueSplit"]) {
+	if (current.level == "sp_timeshift_spoke02" && (settings["dialogueSplit"] || settings["speedmodMode"])) {
 		if (current.x > 8755 && current.x < 9655 && current.z < -4528 && current.y > 5000) {
 			if (vars.dialogueSplitTimer == -1) {
 				vars.dialogueSplitTimer = Environment.TickCount;
@@ -246,7 +258,7 @@ split {
 	}
 	
 	//Beacon 3 Module
-	if (current.level == "sp_beacon" && settings["moduleSplit"]) {
+	if (current.level == "sp_beacon" && (settings["moduleSplit"] || settings["speedmodMode"])) {
 		
 		//Module 1
 		if (current.x > -10661 && current.x < -10660  && current.y > 2224 && current.y < 2225 && current.z > 9537 && current.z < 9538) {
@@ -298,7 +310,7 @@ split {
 	}
 	
 	//Fold Weapon Datacore
-	if (current.level == "sp_skyway_v1" && settings["datacoreSplit"]) {
+	if (current.level == "sp_skyway_v1" && (settings["datacoreSplit"] || settings["speedmodMode"])) {
 		if (current.x > 5293 && current.x < 5294 && current.y > 3577 && current.y < 3578 && current.z > -5749 && current.z < -5748) {
 			if (vars.datacoreSplitTimer == -1) {
 				vars.datacoreSplitTimer = Environment.TickCount;
@@ -313,7 +325,7 @@ split {
 	}
 	
 	//Escape Landing
-	if (current.level == "sp_skyway_v1" && settings["escapeSplit"]) {
+	if (current.level == "sp_skyway_v1" && (settings["escapeSplit"] || settings["speedmodMode"])) {
 		if (current.x > 536 && current.x < 538 && current.y > 6244 && current.y < 6246 && current.z > 6551 && current.z < 6553) {
 			if (!vars.escapeSplit) {
 				vars.escapeSplit = true;
