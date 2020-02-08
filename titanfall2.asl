@@ -2,8 +2,8 @@ state("Titanfall2") {
 	// I believe this has something to do with if the game is rendering anything or not, it stops the timer late
 	int clframes : "materialsystem_dx11.dll", 0x1A9F4A8, 0x58C;
 	
-	// I dont know what this value is, all i know is it equals 0 during loading screens, it starts the timer early
-	int thing : "server.dll", 0x105F678, 0xB0;
+	// I dont know what this value is, all i know is its > 0 during gameplay
+	int thing : "server.dll", 0xC26B04;
 	
 	// This is the last loaded level
 	string20 level : "engine.dll", 0x13536498, 0x2C;
