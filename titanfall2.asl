@@ -11,9 +11,6 @@ state("Titanfall2") {
 	// This number changes to be not 0 when the player is dead
 	int death : "client.dll", 0x02D57D28, 0x328, 0xB8, 0xC0;
 	
-	// Beacon 2 button
-	int button : "client.dll", 0x02E55DC0, 0x0, 0x5908, 0xF4;
-	
 	// Current player position and velocity
 	float x : "client.dll", 0x2172FF8, 0xDEC;
 	float z : "client.dll", 0x2173B48, 0x2A0;
@@ -53,9 +50,13 @@ startup {
 	settings.Add("arkGatesShootSplit", false, "Split when Gates shoots the glass on The Ark (Requires subtitles to be on)", "subSplits");
 	settings.Add("datacoreSplit", false, "Split when you insert BT's datacore on The Fold Weapon", "subSplits");
 	settings.Add("escapeSplit", false, "Split when first land at escape (Also works for fast any% last load)", "subSplits");
+	
+	vars.b2buttonScanTarget = new SigScanTarget(0, "?? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF FF FF FF 00 00 80 3F 00 00 00 00 00 00 00 00 00 00 80 3F 00 00 00 00 77 BE 7F 3F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CD CC CC 3D 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 01 01 00 00 00 00 00 00 00 01 0E 00 70 05 00 00 00 00 00 00 D4 A6 70 50 F9 2D 88 4D 9E 70 F1 DC B6 5F DA 71 00 00 00 00 00 80 BB 44 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 3F 3C 00 00 00 FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00");
 }
 
 init {
+	print("[Autosplitter] initialize");
+	vars.b2button = null;
 	vars.gameEnded = false;
 	
 	vars.bnrIlPause = false;
@@ -134,6 +135,23 @@ start {
 }
 
 update {
+	if (vars.b2button != null) { 
+		vars.b2button.Update(game);
+	} else if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
+		print("[Autosplitter] searching for pointer");
+		
+		var b2buttonPtr = IntPtr.Zero;
+	
+		foreach (var page in game.MemoryPages()) {
+			var scanner = new SignatureScanner(game, page.BaseAddress, (int)page.RegionSize);
+			if((b2buttonPtr = scanner.Scan(vars.b2buttonScanTarget)) != IntPtr.Zero)
+				break;
+		}
+	
+		if (b2buttonPtr != IntPtr.Zero) vars.b2button = new MemoryWatcher<int>(b2buttonPtr);
+		print("[Autosplitter] Pointer found: 0x" + b2buttonPtr.ToString("x"));
+	}
+
 	// Reset if you're at the location at the beginning of the game, are on the sp_training map, and the game is not rendering anything
 	if (current.clframes <= 0 && current.level == "sp_training" && current.x == 10664 && current.y == -6056 && current.z == -10200) {
 		if (!vars.resetLock) {
@@ -346,7 +364,7 @@ split {
 	
 	//Beacon 2 button
 	if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
-		if (old.button == 1 && current.button == 0) {
+		if (vars.b2button.Old == 1 && vars.b2button.Current == 0) {
 			if (old.x > 2350 && current.x < 3000 && current.z > 10200 && current.z < 10550 && current.y > 1110) {
 				return true;
 			}
