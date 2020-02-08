@@ -38,6 +38,7 @@ startup {
 	settings.Add("Arkpause", false, "The Ark IL pause");
 	settings.Add("b2splits", false, "Beacon 2 subsplits");
 	settings.Add("speedmodMode", false, "Speedmod Mode");
+	settings.Add("loadReset", false, "Reset after load screens (IL resets)");
 	
 	settings.Add("subSplits", false, "Sub Splits");
 	settings.Add("batterySplit", false, "Split on Batteries on BT-7274", "subSplits");
@@ -57,6 +58,8 @@ startup {
 init {
 	print("[Autosplitter] initialize");
 	vars.b2button = null;
+	vars.isLoading = false;
+	vars.isLoadingOld = false;
 	vars.gameEnded = false;
 	
 	vars.bnrIlPause = false;
@@ -185,6 +188,9 @@ update {
 		vars.arkIlPause = false;
 		vars.arkIlPausePrep = false;
 	}
+	
+	vars.isLoadingOld = vars.isLoading;
+	vars.isLoading = current.clframes <= 0 || current.thing == 0;
 }
 
 split {
@@ -380,14 +386,16 @@ split {
 }
 
 reset {
+	if (settings["loadReset"] && vars.isLoadingOld && !vars.isLoading) {
+		return true;
+	}
 	if (vars.wishReset) {
 		return true;
 	}
 }
 
 isLoading {
-	var loading = current.clframes <= 0 || current.thing == 0;
-	if (loading) {
+	if (vars.isLoading) {
 		vars.bnrIlPause = false;
 		vars.enc3IlPause = false;
 		vars.arkIlPause = false;
@@ -415,5 +423,5 @@ isLoading {
 		if (old.inCutscene == 0 && current.inCutscene == 1 && current.level == "sp_hub_timeshift" && current.z > 4000) vars.enc3IlPause = true;
 		if (vars.enc3IlPause) return true;
 	}
-	return loading;
+	return vars.isLoading;
 }
