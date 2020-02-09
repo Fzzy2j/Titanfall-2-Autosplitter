@@ -49,6 +49,7 @@ startup {
 	settings.Add("enc2splits", false, "Effect and Cause 2 subsplits");
 	settings.Add("speedmodMode", false, "Speedmod Mode");
 	settings.Add("loadReset", false, "Reset after load screens (IL resets)");
+	settings.Add("ignoreLevelChange", false, "Dont split on level change");
 	
 	settings.Add("subSplits", false, "Sub Splits");
 	settings.Add("batterySplit", false, "Split on Batteries on BT-7274", "subSplits");
@@ -225,7 +226,7 @@ split {
 	}
 	
 	//Level change
-	if (current.level != old.level) {
+	if (current.level != old.level && !settings["ignoreLevelChange"]) {
 		if (current.level == "sp_s2s" && settings["speedmodMode"]) return false;
 		return true;
 	}
