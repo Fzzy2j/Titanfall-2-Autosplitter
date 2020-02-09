@@ -18,6 +18,14 @@ state("Titanfall2") {
 	float angle : "engine.dll", 0x7B666C;
 	float velocity : "client.dll", 0x2A9EEB8, 0x884;
 	
+	// This value is 0 before the button is pressed and jumps to roughly 1115125 after its pressed
+	int bnrbutton1 : "engine.dll", 0x13B1E914;
+	
+	// These values is 33 before the button is pressed and goes to 41 after
+	int bnrbutton2 : "engine.dll", 0x7B9D48;
+	int enc2button1 : "engine.dll", 0x7B9C98;
+	int enc2button2 : "engine.dll", 0x7B9DF8;
+	
 	// Viper kill
 	int viper : "client.dll", 0xC0916C;
 	
@@ -37,6 +45,8 @@ startup {
 	settings.Add("enc3pause", false, "Effect and Cause 3 IL pause");
 	settings.Add("Arkpause", false, "The Ark IL pause");
 	settings.Add("b2splits", false, "Beacon 2 subsplits");
+	settings.Add("bnrsplits", false, "Blood and Rust subsplits");
+	settings.Add("enc2splits", false, "Effect and Cause 2 subsplits");
 	settings.Add("speedmodMode", false, "Speedmod Mode");
 	settings.Add("loadReset", false, "Reset after load screens (IL resets)");
 	
@@ -62,6 +72,8 @@ init {
 	vars.isLoadingOld = false;
 	vars.gameEnded = false;
 	
+	vars.bnrdoorsplit = false;
+	vars.hellroomsplit = false;
 	vars.bnrIlPause = false;
 	vars.enc3IlPause = false;
 	vars.b3IlPause = false;
@@ -156,7 +168,7 @@ update {
 	}
 
 	// Reset if you're at the location at the beginning of the game, are on the sp_training map, and the game is not rendering anything
-	if (current.clframes <= 0 && current.level == "sp_training" && current.x == 10664 && current.y == -6056 && current.z == -10200) {
+	if (vars.isLoading && current.level == "sp_training" && current.x == 10664 && current.y == -6056 && current.z == -10200) {
 		if (!vars.resetLock) {
 			vars.wishReset = true;
 			vars.resetLock = true;
@@ -167,9 +179,11 @@ update {
 		vars.resetLock = false;
 	}
 	
-	if (current.clframes <= 0) {
+	if (vars.isLoading) {
 		vars.battery1Split = false;
 		vars.battery2Split = false;
+		vars.bnrdoorsplit = false;
+		vars.hellroomsplit = false;
 	
 		vars.helmetSplit = false;
 	
@@ -380,6 +394,75 @@ split {
 	//Beacon 2 heatsink trigger
 	if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
 		if (old.x > -2113 && current.x <= -2113 && current.z < 11800 && current.z > 10100) {
+			return true;
+		}
+	}
+	
+	//Bnr button 1
+	if (current.level == "sp_sewers1" && settings["bnrsplits"]) {
+		if (old.bnrbutton1 == 0 && current.bnrbutton1 > 0 && !vars.isLoading) {
+			print("[Autosplitter] button 1");
+			return true;
+		}
+	}
+	
+	//Bnr door trigger
+	if (current.level == "sp_sewers1" && settings["bnrsplits"]) {
+		if ((current.z <= -226 && current.x <= -827 && current.y > 450) && !vars.bnrdoorsplit && !vars.isLoading) {
+			print("[Autosplitter] door split");
+			vars.bnrdoorsplit = true;
+			return true;
+		}
+	}
+	
+	//Bnr button 2
+	if (current.level == "sp_sewers1" && settings["bnrsplits"]) {
+		if (old.bnrbutton2 == 33 && current.bnrbutton2 == 41 && !vars.isLoading) {
+			print("[Autosplitter] button 2");
+			return true;
+		}
+	}
+	
+	//Bnr titan split
+	if (current.level == "sp_sewers1" && settings["bnrsplits"]) {
+		if (old.embarkCount == 0 && current.embarkCount == 1) {
+			print("[Autosplitter] titan");
+			return true;
+		}
+	}
+	
+	//Enc2 button 1
+	if (current.level == "sp_timeshift_spoke02" && settings["enc2splits"]) {
+		if (old.enc2button1 == 33 && current.enc2button1 == 41 && !vars.isLoading) {
+			print("[Autosplitter] button 1");
+			return true;
+		}
+	}
+	
+	//Enc2 button 2
+	if (current.level == "sp_timeshift_spoke02" && settings["enc2splits"]) {
+		if (old.enc2button2 == 33 && current.enc2button2 == 41 && !vars.isLoading) {
+			print("[Autosplitter] button 2");
+			return true;
+		}
+	}
+	
+	//Enc2 hellroom
+	if (current.level == "sp_timeshift_spoke02" && settings["enc2splits"]) {
+		var x = 10708 - current.x;
+		var z = -2263 - current.z;
+		var distanceSquared = x * x + z * z;
+		if (distanceSquared < 15000 && !vars.hellroomsplit && !vars.isLoading) {
+			print("[Autosplitter] hellroom");
+			vars.hellroomsplit = true;
+			return true;
+		}
+	}
+	
+	//Enc2 vents
+	if (current.level == "sp_timeshift_spoke02" && settings["enc2splits"]) {
+		if (current.y < -1200 && old.inCutscene == 0 && current.inCutscene == 1 && !vars.isLoading) {
+			print("[Autosplitter] vents");
 			return true;
 		}
 	}
