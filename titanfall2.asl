@@ -49,47 +49,47 @@ startup {
 	settings.Add("ignoreArk", false, "Ignore Ark Level Change Split (For Speedmod)");
 	
 	settings.Add("btSplits", false, "BT-7274");
-	settings.Add("btBattery1", false, "Split on first battery", "btSplits");
-	settings.Add("btBattery2", false, "Split on second battery", "btSplits");
+	settings.Add("btBattery1", true, "Split on first battery", "btSplits");
+	settings.Add("btBattery2", true, "Split on second battery", "btSplits");
 	
 	settings.Add("bnrSplits", false, "Blood and Rust");
-	settings.Add("bnrButton1", false, "Split on first button", "bnrSplits");
-	settings.Add("bnrDoor", false, "Split at door", "bnrSplits");
-	settings.Add("bnrButton2", false, "Split on second button", "bnrSplits");
-	settings.Add("bnrEmbark", false, "Split on embark BT", "bnrSplits");
+	settings.Add("bnrButton1", true, "Split on first button", "bnrSplits");
+	settings.Add("bnrDoor", true, "Split at door", "bnrSplits");
+	settings.Add("bnrButton2", true, "Split on second button", "bnrSplits");
+	settings.Add("bnrEmbark", true, "Split on embark BT", "bnrSplits");
 	
 	settings.Add("ita3Splits", false, "Into the Abyss 3");
-	settings.Add("ita3Embark", false, "Split on embark BT", "ita3Splits");
+	settings.Add("ita3Embark", true, "Split on embark BT", "ita3Splits");
 	
 	settings.Add("enc1Splits", false, "Effect and Cause 1");
-	settings.Add("enc1Helmet", false, "Split on helmet cutscene", "enc1Splits");
+	settings.Add("enc1Helmet", true, "Split on helmet cutscene", "enc1Splits");
 	
 	settings.Add("enc2Splits", false, "Effect and Cause 2");
-	settings.Add("enc2Button2", false, "Split on second button", "enc2Splits");
-	settings.Add("enc2Button3", false, "Split on third button", "enc2Splits");
-	settings.Add("enc2Dialogue", false, "Split during second dialogue", "enc2Splits");
-	settings.Add("enc2Hellroom", false, "Split at hellroom entrance", "enc2Splits");
-	settings.Add("enc2Vents", false, "Split at bottom of vents", "enc2Splits");
+	settings.Add("enc2Button2", true, "Split on second button", "enc2Splits");
+	settings.Add("enc2Button3", true, "Split on third button", "enc2Splits");
+	settings.Add("enc2Dialogue", true, "Split during second dialogue", "enc2Splits");
+	settings.Add("enc2Hellroom", true, "Split at hellroom entrance", "enc2Splits");
+	settings.Add("enc2Vents", true, "Split at bottom of vents", "enc2Splits");
 	
 	settings.Add("b2Splits", false, "The Beacon 2");
-	settings.Add("b2Warp", false, "Split on death warp", "b2Splits");
-	settings.Add("b2Button1", false, "Split on first button (livesplit will freeze upon enter beacon 2 for the first time)", "b2Splits");
-	settings.Add("b2Trigger", false, "Split when you touch heatsink trigger", "b2Splits");
+	settings.Add("b2Warp", true, "Split on death warp", "b2Splits");
+	settings.Add("b2Button1", true, "Split on first button (livesplit will freeze upon enter beacon 2 for the first time)", "b2Splits");
+	settings.Add("b2Trigger", true, "Split when you touch heatsink trigger", "b2Splits");
 	
 	settings.Add("b3Splits", false, "The Beacon 3");
-	settings.Add("b3Module1", false, "Split on retrieve module", "b3Splits");
-	settings.Add("b3Module2", false, "Split on insert module", "b3Splits");
+	settings.Add("b3Module1", true, "Split on retrieve module", "b3Splits");
+	settings.Add("b3Module2", true, "Split on insert module", "b3Splits");
 	
 	settings.Add("tbfSplits", false, "Trial by Fire");
-	settings.Add("tbfElevator", false, "Split when you get on the elevator (requires subtitles to be on)", "tbfSplits");
+	settings.Add("tbfElevator", true, "Split when you get on the elevator (requires subtitles to be on)", "tbfSplits");
 	
 	settings.Add("arkSplits", false, "The Ark");
-	settings.Add("arkElevator", false, "Split when you get on the elevator", "arkSplits");
-	settings.Add("arkGatesShot", false, "Split when Gates shoots her gun after the fight (requires subtitles to be on)", "arkSplits");
+	settings.Add("arkElevator", true, "Split when you get on the elevator", "arkSplits");
+	settings.Add("arkGatesShot", true, "Split when Gates shoots her gun after the fight (requires subtitles to be on)", "arkSplits");
 	
 	settings.Add("foldSplits", false, "The Fold Weapon");
-	settings.Add("foldDataCore", false, "Split when you insert the data core", "foldSplits");
-	settings.Add("foldEscape", false, "Split when escape starts", "foldSplits");
+	settings.Add("foldDataCore", true, "Split when you insert the data core", "foldSplits");
+	settings.Add("foldEscape", true, "Split when escape starts", "foldSplits");
 	
 	settings.Add("ilSettings", false, "IL Settings");
 	settings.Add("BnRpause", false, "Blood and Rust IL pause", "ilSettings");
