@@ -23,8 +23,11 @@ state("Titanfall2") {
 	
 	// These values is 33 before the button is pressed and goes to 41 after
 	int bnrbutton2 : "engine.dll", 0x7B9D48;
-	int enc2button1 : "engine.dll", 0x7B9C98;
-	int enc2button2 : "engine.dll", 0x7B9DF8;
+	int enc2button2 : "engine.dll", 0x7B9C98;
+	int enc2button3 : "engine.dll", 0x7B9DF8;
+	
+	// This value drops to 0 when the elevator triggers
+	int arkElevator : "engine.dll", 0x139A4D38;
 	
 	// Viper kill
 	int viper : "client.dll", 0xC0916C;
@@ -40,38 +43,71 @@ state("Titanfall2") {
 }
 
 startup {
+	settings.Add("levelChangeSplit", true, "Split on level change");
+	settings.Add("endSplit", true, "Split at the end of escape (end of run)");
 	settings.Add("removeLoads", true, "Remove Loads");
-	settings.Add("BnRpause", false, "Blood and Rust IL pause");
-	settings.Add("enc3pause", false, "Effect and Cause 3 IL pause");
-	settings.Add("Arkpause", false, "The Ark IL pause");
-	settings.Add("b2splits", false, "Beacon 2 subsplits");
-	settings.Add("bnrsplits", false, "Blood and Rust subsplits");
-	settings.Add("enc2splits", false, "Effect and Cause 2 subsplits");
-	settings.Add("speedmodMode", false, "Speedmod Mode");
-	settings.Add("loadReset", false, "Reset after load screens (IL resets)");
-	settings.Add("ignoreLevelChange", false, "Dont split on level change");
+	settings.Add("ignoreArk", false, "Ignore Ark Level Change Split (For Speedmod)");
 	
-	settings.Add("subSplits", false, "Sub Splits");
-	settings.Add("batterySplit", false, "Split on Batteries on BT-7274", "subSplits");
-	settings.Add("ita3TitanSplit", false, "Split on Embark on Into the Abyss 3", "subSplits");
-	settings.Add("helmetSplit", false, "Split on helmet grab on Effect and Cause 1", "subSplits");
-	settings.Add("dialogueSplit", false, "Split on dialogue on Effect and Cause 2", "subSplits");
-	settings.Add("moduleSplit", false, "Split on modules on Beacon 3", "subSplits");
-	settings.Add("tbfElevatorSplit", false, "Split on elevator on Trial by Fire (Requires subtitles to be on)", "subSplits");
-	settings.Add("arkElevatorSplit", false, "Split on elevator on The Ark (Requires subtitles to be on)", "subSplits");
-	settings.Add("arkGatesShootSplit", false, "Split when Gates shoots the glass on The Ark (Requires subtitles to be on)", "subSplits");
-	settings.Add("datacoreSplit", false, "Split when you insert BT's datacore on The Fold Weapon", "subSplits");
-	settings.Add("escapeSplit", false, "Split when first land at escape (Also works for fast any% last load)", "subSplits");
+	settings.Add("btSplits", false, "BT-7274");
+	settings.Add("btBattery1", false, "Split on first battery", "btSplits");
+	settings.Add("btBattery2", false, "Split on second battery", "btSplits");
+	
+	settings.Add("bnrSplits", false, "Blood and Rust");
+	settings.Add("bnrButton1", false, "Split on first button", "bnrSplits");
+	settings.Add("bnrDoor", false, "Split at door", "bnrSplits");
+	settings.Add("bnrButton2", false, "Split on second button", "bnrSplits");
+	settings.Add("bnrEmbark", false, "Split on embark BT", "bnrSplits");
+	
+	settings.Add("ita3Splits", false, "Into the Abyss 3");
+	settings.Add("ita3Embark", false, "Split on embark BT", "ita3Splits");
+	
+	settings.Add("enc1Splits", false, "Effect and Cause 1");
+	settings.Add("enc1Helmet", false, "Split on helmet cutscene", "enc1Splits");
+	
+	settings.Add("enc2Splits", false, "Effect and Cause 2");
+	settings.Add("enc2Button2", false, "Split on second button", "enc2Splits");
+	settings.Add("enc2Button3", false, "Split on third button", "enc2Splits");
+	settings.Add("enc2Dialogue", false, "Split during second dialogue", "enc2Splits");
+	settings.Add("enc2Hellroom", false, "Split at hellroom entrance", "enc2Splits");
+	settings.Add("enc2Vents", false, "Split at bottom of vents", "enc2Splits");
+	
+	settings.Add("b2Splits", false, "The Beacon 2");
+	settings.Add("b2Warp", false, "Split on death warp", "b2Splits");
+	settings.Add("b2Button1", false, "Split on first button (livesplit will freeze upon enter beacon 2 for the first time)", "b2Splits");
+	settings.Add("b2Trigger", false, "Split when you touch heatsink trigger", "b2Splits");
+	
+	settings.Add("b3Splits", false, "The Beacon 3");
+	settings.Add("b3Module1", false, "Split on retrieve module", "b3Splits");
+	settings.Add("b3Module2", false, "Split on insert module", "b3Splits");
+	
+	settings.Add("tbfSplits", false, "Trial by Fire");
+	settings.Add("tbfElevator", false, "Split when you get on the elevator (requires subtitles to be on)", "tbfSplits");
+	
+	settings.Add("arkSplits", false, "The Ark");
+	settings.Add("arkElevator", false, "Split when you get on the elevator", "arkSplits");
+	settings.Add("arkGatesShot", false, "Split when Gates shoots her gun after the fight (requires subtitles to be on)", "arkSplits");
+	
+	settings.Add("foldSplits", false, "The Fold Weapon");
+	settings.Add("foldDataCore", false, "Split when you insert the data core", "foldSplits");
+	settings.Add("foldEscape", false, "Split when escape starts", "foldSplits");
+	
+	settings.Add("ilSettings", false, "IL Settings");
+	settings.Add("BnRpause", false, "Blood and Rust IL pause", "ilSettings");
+	settings.Add("enc3pause", false, "Effect and Cause 3 IL pause", "ilSettings");
+	settings.Add("Arkpause", false, "The Ark IL pause", "ilSettings");
+	settings.Add("loadReset", false, "Reset after load screens (IL resets)", "ilSettings");
+	
 	
 	vars.b2buttonScanTarget = new SigScanTarget(0, "?? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF FF FF FF 00 00 80 3F 00 00 00 00 00 00 00 00 00 00 80 3F 00 00 00 00 77 BE 7F 3F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CD CC CC 3D 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 01 01 00 00 00 00 00 00 00 01 0E 00 70 05 00 00 00 00 00 00 D4 A6 70 50 F9 2D 88 4D 9E 70 F1 DC B6 5F DA 71 00 00 00 00 00 80 BB 44 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 3F 3C 00 00 00 FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00");
 }
 
 init {
-	print("[Autosplitter] initialize");
 	vars.b2button = null;
 	vars.isLoading = false;
 	vars.isLoadingOld = false;
-	vars.gameEnded = false;
+	vars.splitTimer = 0;
+	vars.splitTimerTimestamp = 0;
+	vars.enc2Dialogue = false;
 	
 	vars.bnrdoorsplit = false;
 	vars.hellroomsplit = false;
@@ -83,21 +119,6 @@ init {
 	
 	vars.resetLock = false;
 	vars.wishReset = false;
-	
-	vars.battery1Split = false;
-	vars.battery2Split = false;
-	
-	vars.helmetSplit = false;
-	
-	vars.dialogueSplitTimer = -1;
-	
-	vars.arkElevatorSplitTimer = -1;
-	
-	vars.module1Split = false;
-	vars.module2Split = false;
-	
-	vars.datacoreSplitTimer = -1;
-	vars.escapeSplit = false;
 }
 
 start {
@@ -151,9 +172,12 @@ start {
 }
 
 update {
+	if (vars.isLoading) {
+		vars.splitTimer = 0;
+	}
 	if (vars.b2button != null) { 
 		vars.b2button.Update(game);
-	} else if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
+	} else if (current.level == "sp_beacon_spoke0" && settings["b2Button1"]) {
 		print("[Autosplitter] searching for pointer");
 		
 		var b2buttonPtr = IntPtr.Zero;
@@ -181,22 +205,8 @@ update {
 	}
 	
 	if (vars.isLoading) {
-		vars.battery1Split = false;
-		vars.battery2Split = false;
 		vars.bnrdoorsplit = false;
 		vars.hellroomsplit = false;
-	
-		vars.helmetSplit = false;
-	
-		vars.dialogueSplitTimer = -1;
-	
-		vars.arkElevatorSplitTimer = -1;
-	
-		vars.module1Split = false;
-		vars.module2Split = false;
-	
-		vars.datacoreSplitTimer = -1;
-		vars.escapeSplit = false;
 	
 		vars.bnrIlPause = false;
 		vars.enc3IlPause = false;
@@ -217,254 +227,246 @@ split {
 		}
 	}
 	
+	// This is used for delaying splits
+	var timePassed = Environment.TickCount - vars.splitTimerTimestamp;
+	vars.splitTimerTimestamp = Environment.TickCount;
+	if (vars.splitTimer > 0) {
+		var adjustment = vars.splitTimer - timePassed;
+		if (adjustment <= 0) {
+			vars.splitTimer = 0;
+			return true;
+		} else {
+			vars.splitTimer = adjustment;
+		}
+	}
+	
 	// End of game
-	if (current.level == "sp_skyway_v1" && current.x < -11000 && current.z > 0 && current.velocity <= 0 && !vars.gameEnded) {
-		vars.gameEnded = true;
+	if (current.level == "sp_skyway_v1" && current.x < -10000 && current.z > 0 && old.inCutscene == 0 && current.inCutscene == 1 && settings["endSplit"]) {
 		return true;
-	} else if (current.level != "sp_skyway_v1" || current.x > -11000) {
-		vars.gameEnded = false;
 	}
 	
 	//Level change
-	if (current.level != old.level && !settings["ignoreLevelChange"]) {
-		if (current.level == "sp_s2s" && settings["speedmodMode"]) return false;
+	if (current.level != old.level && settings["levelChangeSplit"]) {
+		if (current.level == "sp_s2s" && settings["ignoreArk"]) return false;
 		return true;
 	}
 	
-	//Batteries on BT
-	if (current.level == "sp_crashsite" && (settings["batterySplit"] || settings["speedmodMode"])) {
+	// BT-7274
+	if (current.level == "sp_crashsite") {
+	
 		//Battery 1
-		if (current.x > -4598 && current.x < -4590 && current.y > 2110 && current.y < 2140 && current.z > -3650 && current.z < -3640) {
-			if (!vars.battery1Split) {
-				vars.battery1Split = true;
+		if (settings["btBattery1"]) {
+			var x = -4568 - current.x;
+			var z = -3669 - current.z;
+			var distanceSquared = x * x + z * z;
+			if (distanceSquared < 25000 && old.inCutscene == 0 && current.inCutscene == 1) {
 				return true;
 			}
-		} else if (current.clframes <= 0)
-			vars.battery1Split = false;
-			
+		}
+		
 		//Battery 2
-		if (current.x > -4110 && current.x < -4090 && current.y > 2320 && current.y < 2335  && current.z > 4580 && current.z < 4590) {
-			if (!vars.battery2Split) {
-				vars.battery2Split = true;
+		if (settings["btBattery2"]) {
+			var x = -4111 - current.x;
+			var z = 4583 - current.z;
+			var distanceSquared = x * x + z * z;
+			if (distanceSquared < 25000 && old.inCutscene == 0 && current.inCutscene == 1) {
 				return true;
 			}
-		} else if (current.clframes <= 0)
-			vars.battery2Split = false;
+		}
+	}
+	
+	// Blood and Rust
+	if (current.level == "sp_sewers1") {
+	
+		// Button 1
+		if (settings["bnrButton1"]) {
+			if (old.bnrbutton1 == 0 && current.bnrbutton1 > 0 && !vars.isLoading) {
+				return true;
+			}
+		}
+	
+		// Door trigger
+		if (settings["bnrDoor"]) {
+			if ((current.z <= -226 && current.x <= -827 && current.y > 450) && !vars.bnrdoorsplit && !vars.isLoading) {
+				vars.bnrdoorsplit = true;
+				return true;
+			}
+		}
+	
+		// Button 2
+		if (settings["bnrButton2"]) {
+			if (old.bnrbutton2 == 33 && current.bnrbutton2 == 41 && !vars.isLoading) {
+				return true;
+			}
+		}
+	
+		// BT embark
+		if (settings["bnrEmbark"]) {
+			if (old.embarkCount == 0 && current.embarkCount == 1) {
+				return true;
+			}
+		}
 	}
 	
 	//Embark on ITA3
-	if (current.level == "sp_boomtown_end" && settings["ita3TitanSplit"]) {
+	if (current.level == "sp_boomtown_end" && settings["ita3Embark"]) {
 		if (old.embarkCount == 0 && current.embarkCount == 1) {
 			return true;
 		}
 	}
 	
 	//Helmet on E&C1
-	if (current.level == "sp_hub_timeshift" && settings["helmetSplit"]) {
-		if (current.x > 1005 && current.x < 1011 && current.y > -850 && current.y < -847 && current.z > -2720 && current.z < -2718) {
-			if (!vars.helmetSplit) {
-				vars.helmetSplit = true;
-				
-				System.Diagnostics.Process[] tf2Processes = System.Diagnostics.Process.GetProcessesByName("Titanfall2");
-				if (tf2Processes.Length > 0)
-				{
-					print("process found!");
-					System.Diagnostics.Process process = tf2Processes[0];
-					System.IntPtr h = process.MainWindowHandle;
-					System.Windows.Forms.SendKeys.Send("`");
-				}
-				
-				return true;
-			}
-		} else if (current.clframes <= 0)
-			vars.helmetSplit = false;
-	}
-	
-	//E&C 2 Dialogue
-	//Waits 3 seconds after cutscene starts (thanks for making it more complicated than it had to be bry ;])
-	if (current.level == "sp_timeshift_spoke02" && (settings["dialogueSplit"] || settings["speedmodMode"])) {
-		if (current.x > 8755 && current.x < 9655 && current.z < -4528 && current.y > 5000) {
-			if (vars.dialogueSplitTimer == -1) {
-				vars.dialogueSplitTimer = Environment.TickCount;
-			}
-		} else if (current.clframes <= 0)
-			vars.dialogueSplitTimer = -1;
-		
-		if (vars.dialogueSplitTimer > 0 && Environment.TickCount - vars.dialogueSplitTimer >= 3000) {
-			vars.dialogueSplitTimer = -2;
-			return true;
+	if (current.level == "sp_hub_timeshift" && settings["enc1Helmet"]) {
+		var x = 997 - current.x;
+		var z = -2718 - current.z;
+		var distanceSquared = x * x + z * z;
+		if (distanceSquared < 25000 && old.inCutscene == 0 && current.inCutscene == 1) {
+			vars.splitTimer = 1800;
 		}
 	}
 	
-	//Beacon 3 Module
-	if (current.level == "sp_beacon" && (settings["moduleSplit"] || settings["speedmodMode"])) {
-		
-		//Module 1
-		if (current.x > -10661 && current.x < -10660  && current.y > 2224 && current.y < 2225 && current.z > 9537 && current.z < 9538) {
-			if (!vars.module1Split) {
-				vars.module1Split = true;
+	//E&C 2
+	if (current.level == "sp_timeshift_spoke02") {
+	
+		// Dialogue
+		if (settings["enc2Dialogue"]) {
+			if (current.x > 8755 && current.x < 9655 && current.z < -4528 && current.y > 5000) {
+				if (!vars.enc2Dialogue) {
+					vars.splitTimer = 3000;
+					vars.enc2Dialogue = true;
+				}
+			} else if (vars.isLoading)
+				vars.enc2Dialogue = false;
+		}
+	
+		// Button 2
+		if (settings["enc2Button2"]) {
+			if (old.enc2button2 == 33 && current.enc2button2 == 41 && !vars.isLoading) {
 				return true;
 			}
-		} else if (current.clframes <= 0)
-			vars.module1Split = false;
+		}
+		
+		// Button 3
+		if (settings["enc2Button3"]) {
+			if (old.enc2button3 == 33 && current.enc2button3 == 41 && !vars.isLoading) {
+				return true;
+			}
+		}
+	
+		// Hellroom
+		if (settings["enc2Hellroom"]) {
+			var x = 10708 - current.x;
+			var z = -2263 - current.z;
+			var distanceSquared = x * x + z * z;
+			if (distanceSquared < 15000 && !vars.hellroomsplit && !vars.isLoading) {
+				vars.hellroomsplit = true;
+				return true;
+			}
+		}
+	
+		//Enc2 vents
+		if (settings["enc2Vents"]) {
+			if (current.y < -1200 && old.inCutscene == 0 && current.inCutscene == 1 && !vars.isLoading) {
+				return true;
+			}
+		}
+	}
+	
+	// Beacon 2
+	if (current.level == "sp_beacon_spoke0") {
+	
+		// Death warp
+		if (settings["b2Warp"]) {
+			if (current.x > 1100 && current.x < 2000 && current.z > 4300 && current.z < 4600) {
+				if (current.death != 0 && old.death == 0) {
+					return true;
+				}
+			}
+		}
+	
+		// Button 1
+		if (settings["b2Button1"]) {
+			if (vars.b2button.Old == 1 && vars.b2button.Current == 0) {
+				if (old.x > 2350 && current.x < 3000 && current.z > 10200 && current.z < 10550 && current.y > 1110) {
+					return true;
+				}
+			}
+		}
+	
+		// Heatsink trigger
+		if (settings["b2Trigger"]) {
+			if (old.x > -2113 && current.x <= -2113 && current.z < 11800 && current.z > 10100) {
+				return true;
+			}
+		}
+	}
+	
+	// Beacon 3
+	if (current.level == "sp_beacon") {
+		
+		// Module retrieve
+		if (settings["b3Module1"]) {
+			var x = -10670 - current.x;
+			var z = 9523 - current.z;
+			var distanceSquared = x * x + z * z;
+			if (distanceSquared < 25000 && old.inCutscene == 0 && current.inCutscene == 1) {
+				vars.splitTimer = 1900;
+			}
+		}
 			
 		//Module 2
-		if (current.x > 3793 && current.x < 3794  && current.y > 4739 && current.y < 4740 && current.z > -1907 && current.z < -1906) {
-			if (!vars.module2Split) {
-				vars.module2Split = true;
-				return true;
+		if (settings["b3Module2"]) {
+			var x = 3797 - current.x;
+			var z = -1905 - current.z;
+			var distanceSquared = x * x + z * z;
+			if (distanceSquared < 25000 && old.inCutscene == 0 && current.inCutscene == 1) {
+				vars.splitTimer = 1850;
 			}
-		} else if (current.clframes <= 0)
-			vars.module2Split = false;
+		}
 	}
+	
 	//TBF Elevator
-	if (current.level == "sp_tday" && settings["tbfElevatorSplit"]) {
+	if (current.level == "sp_tday" && settings["tbfElevator"]) {
 		if (old.dialogue != current.dialogue && (current.dialogue.StartsWith("Sarah: (radio) Here ") || dialogueCount == 396581)) {
 			return true;
 		}
 	}
 	
-	//Ark Elevator
-	if (current.level == "sp_s2s" && settings["arkElevatorSplit"]) {
-		if (current.dialogue.StartsWith("CPT Meas: (radio) Co") || dialogueCount == 388777) {
-			if (vars.arkElevatorSplitTimer == -1) {
-				vars.arkElevatorSplitTimer = Environment.TickCount;
-			}
+	// The Ark
+	if (current.level == "sp_s2s") {
+	
+		// Elevator
+		if (settings["arkElevator"] && old.arkElevator > 0 && current.arkElevator == 0 && current.y > -3000) {
+			vars.splitTimer = 1600;
 		}
 		
-		if (vars.arkElevatorSplitTimer > 0 && Environment.TickCount - vars.arkElevatorSplitTimer >= 1100) {
-			vars.arkElevatorSplitTimer = -2;
-			return true;
-		}
-		
-		if (current.clframes <= 0)
-			vars.arkElevatorSplitTimer = -1;
-	}
-	
-	//Ark Gates Shot
-	if (current.level == "sp_s2s" && settings["arkGatesShootSplit"]) {
-		if (old.dialogue != current.dialogue && (current.dialogue.StartsWith("Bear: Hold your fire") || dialogueCount == 354581)) {
+		// Gates shot
+		if (settings["arkGatesShootSplit"] && old.dialogue != current.dialogue && (current.dialogue.StartsWith("Bear: Hold your fire") || dialogueCount == 354581)) {
 			return true;
 		}
 	}
 	
-	//Fold Weapon Datacore
-	if (current.level == "sp_skyway_v1" && (settings["datacoreSplit"] || settings["speedmodMode"])) {
-		if (current.x > 5293 && current.x < 5294 && current.y > 3577 && current.y < 3578 && current.z > -5749 && current.z < -5748) {
-			if (vars.datacoreSplitTimer == -1) {
-				vars.datacoreSplitTimer = Environment.TickCount;
+	// The Fold Weapon
+	if (current.level == "sp_skyway_v1") {
+	
+		// Datacore
+		if (settings["foldDataCore"]) {
+			var x = 5252 - current.x;
+			var z = -5776 - current.z;
+			var distanceSquared = x * x + z * z;
+			if (distanceSquared < 25000 && old.inCutscene == 0 && current.inCutscene == 1) {
+				vars.splitTimer = 7950;
 			}
-		} else if (current.clframes <= 0)
-			vars.datacoreSplitTimer = -1;
-			
-		if (vars.datacoreSplitTimer > 0 && Environment.TickCount - vars.datacoreSplitTimer >= 1500) {
-			vars.datacoreSplitTimer = -2;
-			return true;
 		}
-	}
 	
-	//Escape Landing
-	if (current.level == "sp_skyway_v1" && (settings["escapeSplit"] || settings["speedmodMode"])) {
-		if (current.x > 536 && current.x < 538 && current.y > 6244 && current.y < 6246 && current.z > 6551 && current.z < 6553) {
-			if (!vars.escapeSplit) {
-				vars.escapeSplit = true;
+		// Escape land
+		if (settings["foldEscape"]) {
+			var x = 535 - current.x;
+			var z = 6549 - current.z;
+			var distanceSquared = x * x + z * z;
+			if (distanceSquared < 25000 && old.inCutscene != 0 && current.inCutscene == 0) {
 				return true;
 			}
-		} else if (current.clframes <= 0)
-			vars.escapeSplit = false;
-	}
-	
-	//Beacon 2 warp
-	if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
-		if (current.x > 1100 && current.x < 2000 && current.z > 4300 && current.z < 4600) {
-			if (current.death != 0 && old.death == 0) {
-				return true;
-			}
-		}
-	}
-	
-	//Beacon 2 button
-	if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
-		if (vars.b2button.Old == 1 && vars.b2button.Current == 0) {
-			if (old.x > 2350 && current.x < 3000 && current.z > 10200 && current.z < 10550 && current.y > 1110) {
-				return true;
-			}
-		}
-	}
-	
-	//Beacon 2 heatsink trigger
-	if (current.level == "sp_beacon_spoke0" && settings["b2splits"]) {
-		if (old.x > -2113 && current.x <= -2113 && current.z < 11800 && current.z > 10100) {
-			return true;
-		}
-	}
-	
-	//Bnr button 1
-	if (current.level == "sp_sewers1" && settings["bnrsplits"]) {
-		if (old.bnrbutton1 == 0 && current.bnrbutton1 > 0 && !vars.isLoading) {
-			print("[Autosplitter] button 1");
-			return true;
-		}
-	}
-	
-	//Bnr door trigger
-	if (current.level == "sp_sewers1" && settings["bnrsplits"]) {
-		if ((current.z <= -226 && current.x <= -827 && current.y > 450) && !vars.bnrdoorsplit && !vars.isLoading) {
-			print("[Autosplitter] door split");
-			vars.bnrdoorsplit = true;
-			return true;
-		}
-	}
-	
-	//Bnr button 2
-	if (current.level == "sp_sewers1" && settings["bnrsplits"]) {
-		if (old.bnrbutton2 == 33 && current.bnrbutton2 == 41 && !vars.isLoading) {
-			print("[Autosplitter] button 2");
-			return true;
-		}
-	}
-	
-	//Bnr titan split
-	if (current.level == "sp_sewers1" && settings["bnrsplits"]) {
-		if (old.embarkCount == 0 && current.embarkCount == 1) {
-			print("[Autosplitter] titan");
-			return true;
-		}
-	}
-	
-	//Enc2 button 1
-	if (current.level == "sp_timeshift_spoke02" && settings["enc2splits"]) {
-		if (old.enc2button1 == 33 && current.enc2button1 == 41 && !vars.isLoading) {
-			print("[Autosplitter] button 1");
-			return true;
-		}
-	}
-	
-	//Enc2 button 2
-	if (current.level == "sp_timeshift_spoke02" && settings["enc2splits"]) {
-		if (old.enc2button2 == 33 && current.enc2button2 == 41 && !vars.isLoading) {
-			print("[Autosplitter] button 2");
-			return true;
-		}
-	}
-	
-	//Enc2 hellroom
-	if (current.level == "sp_timeshift_spoke02" && settings["enc2splits"]) {
-		var x = 10708 - current.x;
-		var z = -2263 - current.z;
-		var distanceSquared = x * x + z * z;
-		if (distanceSquared < 15000 && !vars.hellroomsplit && !vars.isLoading) {
-			print("[Autosplitter] hellroom");
-			vars.hellroomsplit = true;
-			return true;
-		}
-	}
-	
-	//Enc2 vents
-	if (current.level == "sp_timeshift_spoke02" && settings["enc2splits"]) {
-		if (current.y < -1200 && old.inCutscene == 0 && current.inCutscene == 1 && !vars.isLoading) {
-			print("[Autosplitter] vents");
-			return true;
 		}
 	}
 }
