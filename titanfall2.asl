@@ -8,9 +8,6 @@ state("Titanfall2") {
 	// This is the last loaded level
 	string20 level : "engine.dll", 0x13536498, 0x2C;
 	
-	// This number changes to be not 0 when the player is dead
-	int death : "client.dll", 0x02D57D28, 0x328, 0xB8, 0xC0;
-	
 	// Current player position and velocity
 	float x : "client.dll", 0x2172FF8, 0xDEC;
 	float z : "client.dll", 0x2173B48, 0x2A0;
@@ -377,10 +374,14 @@ split {
 	
 		// Death warp
 		if (settings["b2Warp"]) {
-			if (current.x > 1100 && current.x < 2000 && current.z > 4300 && current.z < 4600) {
-				if (current.death != 0 && old.death == 0) {
-					return true;
-				}
+			var destinationX = 4019 - current.x;
+			var destinationZ = 4233 - current.z;
+			var destinationDistanceSquared = destinationX * destinationX + destinationZ * destinationZ;
+			var warpX = old.x - current.x;
+			var warpZ = old.z - current.z;
+			var warpDistanceSquared = warpX * warpX + warpZ * warpZ;
+			if (destinationDistanceSquared < 500 && warpDistanceSquared > 20000) {
+				return true;
 			}
 		}
 	
