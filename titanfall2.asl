@@ -46,7 +46,7 @@ state("Titanfall2") {
 }
 
 startup {
-	settings.Add("flagSplit", true, "Start timer on flag pickup and split on flag capture (multiplayer)");
+	settings.Add("flagSplit", false, "Start timer on flag pickup, split on flag capture, and pause when not holding flag (multiplayer)");
 	settings.Add("levelChangeSplit", true, "Split on level change");
 	settings.Add("helmetSplit", false, "Split on helmet pickup");
 	settings.Add("endSplit", true, "Split at the end of escape (end of run)");
@@ -495,6 +495,12 @@ reset {
 }
 
 isLoading {
+	if (settings["flagSplit"]) {
+		if (current.flag == 0) 
+			return true; 
+		else 
+			return false;
+	}
 	if (vars.isLoading) {
 		vars.bnrIlPause = false;
 		vars.enc3IlPause = false;
