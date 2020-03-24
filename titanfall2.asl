@@ -8,6 +8,12 @@ state("Titanfall2") {
 	// This is the last loaded level
 	string20 level : "engine.dll", 0x13536498, 0x2C;
 	
+	// This shows bits of text on the ui, including the Found x / x displayed when picking up helmets
+	string20 menuText : "client.dll", 0x22BC680;
+	
+	// 1 when holding flag, 0 when not
+	int flag : "engine.dll", 0x111E1B60;
+	
 	// Current player position and velocity
 	float x : "client.dll", 0x2172FF8, 0xDEC;
 	float z : "client.dll", 0x2173B48, 0x2A0;
@@ -18,7 +24,7 @@ state("Titanfall2") {
 	// This value is 0 before the button is pressed and jumps to roughly 1115125 after its pressed
 	int bnrbutton1 : "engine.dll", 0x13B1E914;
 	
-	// These values is 33 before the button is pressed and goes to 41 after
+	// These values are 33 before the button is pressed and go to 41 after
 	int bnrbutton2 : "engine.dll", 0x7B9D48;
 	int enc2button2 : "engine.dll", 0x7B9C98;
 	int enc2button3 : "engine.dll", 0x7B9DF8;
@@ -40,7 +46,9 @@ state("Titanfall2") {
 }
 
 startup {
+	settings.Add("flagSplit", true, "Start timer on flag pickup and split on flag capture (multiplayer)")
 	settings.Add("levelChangeSplit", true, "Split on level change");
+	settings.Add("helmetSplit", false, "Split on helmet pickup");
 	settings.Add("endSplit", true, "Split at the end of escape (end of run)");
 	settings.Add("removeLoads", true, "Remove Loads");
 	settings.Add("ignoreArk", false, "Ignore Ark Level Change Split (For Speedmod)");
@@ -119,6 +127,7 @@ init {
 }
 
 start {
+	if (settings["flagSplit"] && old.flag == 0 && current.flag == 1) return true;
 	if (old.clframes <= 0 && current.clframes > 0) {
 		//Pilots Gauntlet
 		if (current.level == "sp_training" && old.x > 10600 && old.x < 10700 && old.z > -10300 && old.z < -10100)
@@ -223,6 +232,9 @@ split {
 			dialogueCount += current.dialogue[i];
 		}
 	}
+	if (settings["flagSplit"] && old.flag == 1 && current.flag == 0) return true;
+	
+	if (settings["helmetSplit"] && !old.menuText.StartsWith("Found ") && current.menuText.StartsWith("Found ")) return true;
 	
 	// This is used for delaying splits
 	var timePassed = Environment.TickCount - vars.splitTimerTimestamp;
@@ -477,6 +489,7 @@ reset {
 		return true;
 	}
 	if (vars.wishReset) {
+		vars.wishReset = false;
 		return true;
 	}
 }
