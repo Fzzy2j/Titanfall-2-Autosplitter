@@ -234,7 +234,7 @@ split {
 	}
 	if (settings["flagSplit"] && old.flag == 1 && current.flag == 0) return true;
 	
-	if (settings["helmetSplit"] && !old.menuText.StartsWith("Found ") && current.menuText.StartsWith("Found ")) return true;
+	if (settings["helmetSplit"] && ((!old.menuText.StartsWith("Found ") && current.menuText.StartsWith("Found ")) || (!old.menuText.StartsWith("尋獲 ") && current.menuText.StartsWith("尋獲 ")))) return true;
 	
 	// This is used for delaying splits
 	var timePassed = Environment.TickCount - vars.splitTimerTimestamp;
