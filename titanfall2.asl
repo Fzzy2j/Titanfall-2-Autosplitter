@@ -46,7 +46,7 @@ state("Titanfall2") {
 }
 
 startup {
-	settings.Add("flagSplit", true, "Start timer on flag pickup and split on flag capture (multiplayer)")
+	settings.Add("flagSplit", true, "Start timer on flag pickup and split on flag capture (multiplayer)");
 	settings.Add("levelChangeSplit", true, "Split on level change");
 	settings.Add("helmetSplit", false, "Split on helmet pickup");
 	settings.Add("endSplit", true, "Split at the end of escape (end of run)");
