@@ -454,7 +454,7 @@ split {
 		}
 		
 		// Gates shot
-		if (settings["arkGatesShootSplit"] && old.dialogue != current.dialogue && (current.dialogue.StartsWith("Bear: Hold your fire") || dialogueCount == 354581)) {
+		if (settings["arkGatesShot"] && old.dialogue != current.dialogue && (current.dialogue.StartsWith("Bear: Hold your fire") || dialogueCount == 354581)) {
 			return true;
 		}
 	}
@@ -474,10 +474,10 @@ split {
 	
 		// Escape land
 		if (settings["foldEscape"]) {
-			var x = 535 - current.x;
-			var z = 6549 - current.z;
-			var distanceSquared = x * x + z * z;
-			if (distanceSquared < 25000 && old.inCutscene != 0 && current.inCutscene == 0) {
+			var x1 = 535 - current.x;
+			var z1 = 6549 - current.z;
+			var distanceSquared1 = x1 * x1 + z1 * z1;
+			if (distanceSquared1 < 25000 && old.angle == 0 && current.angle != 0) {
 				return true;
 			}
 		}
