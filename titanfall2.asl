@@ -381,7 +381,7 @@ split {
 	
 		// Button 1
 		if (settings["b2Button1"]) {
-			if ((current.b2button == 8 || current.b2button == 9) && old.b2button == 10) {
+			if (current.b2button != 10 && old.b2button == 10) {
 				if (old.x > 2350 && current.x < 3000 && current.z > 10200 && current.z < 10550 && current.y > 1110) {
 					return true;
 				}
