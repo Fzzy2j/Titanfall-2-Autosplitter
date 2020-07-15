@@ -116,6 +116,7 @@ init {
 	vars.hellroomsplit = false;
 	vars.bnrIlPause = false;
 	vars.enc3IlPause = false;
+	vars.b2buttonTimestamp = 0;
 	vars.b3IlPause = false;
 	vars.arkIlPause = false;
 	vars.arkIlPausePrep = false;
@@ -381,7 +382,8 @@ split {
 	
 		// Button 1
 		if (settings["b2Button1"]) {
-			if (current.b2button != old.b2button) {
+			if (current.b2button != old.b2button && Environment.TickCount - vars.b2buttonTimestamp > 1000) {
+				vars.b2buttonTimestamp = Environment.TickCount;
 				if (old.x > 2350 && current.x < 3000 && current.z > 10200 && current.z < 10550 && current.y > 1110) {
 					return true;
 				}
