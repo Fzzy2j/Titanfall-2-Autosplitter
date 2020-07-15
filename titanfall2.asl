@@ -29,6 +29,8 @@ state("Titanfall2") {
 	int enc2button2 : "engine.dll", 0x7B9C98;
 	int enc2button3 : "engine.dll", 0x7B9DF8;
 	
+	int b2button : "client.dll", 0x23E7BCC;
+	
 	// This value drops to 0 when the elevator triggers
 	int arkElevator : "engine.dll", 0x139A4D38;
 	
@@ -101,13 +103,9 @@ startup {
 	settings.Add("enc3pause", false, "Effect and Cause 3 IL pause", "ilSettings");
 	settings.Add("Arkpause", false, "The Ark IL pause", "ilSettings");
 	settings.Add("loadReset", false, "Reset after load screens (IL resets)", "ilSettings");
-	
-	
-	vars.b2buttonScanTarget = new SigScanTarget(0, "?? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF FF FF FF 00 00 80 3F 00 00 00 00 00 00 00 00 00 00 80 3F 00 00 00 00 77 BE 7F 3F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CD CC CC 3D 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 01 01 00 00 00 00 00 00 00 01 0E 00 70 05 00 00 00 00 00 00 D4 A6 70 50 F9 2D 88 4D 9E 70 F1 DC B6 5F DA 71 00 00 00 00 00 80 BB 44 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 3F 3C 00 00 00 FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00");
 }
 
 init {
-	vars.b2button = null;
 	vars.isLoading = false;
 	vars.isLoadingOld = false;
 	vars.splitTimer = 0;
@@ -180,22 +178,6 @@ start {
 update {
 	if (vars.isLoading) {
 		vars.splitTimer = 0;
-	}
-	if (vars.b2button != null) { 
-		vars.b2button.Update(game);
-	} else if (current.level == "sp_beacon_spoke0" && settings["b2Button1"]) {
-		print("[Autosplitter] searching for pointer");
-		
-		var b2buttonPtr = IntPtr.Zero;
-	
-		foreach (var page in game.MemoryPages()) {
-			var scanner = new SignatureScanner(game, page.BaseAddress, (int)page.RegionSize);
-			if((b2buttonPtr = scanner.Scan(vars.b2buttonScanTarget)) != IntPtr.Zero)
-				break;
-		}
-	
-		if (b2buttonPtr != IntPtr.Zero) vars.b2button = new MemoryWatcher<int>(b2buttonPtr);
-		print("[Autosplitter] Pointer found: 0x" + b2buttonPtr.ToString("x"));
 	}
 
 	// Reset if you're at the location at the beginning of the game, are on the sp_training map, and the game is not rendering anything
@@ -392,14 +374,14 @@ split {
 			var warpX = old.x - current.x;
 			var warpZ = old.z - current.z;
 			var warpDistanceSquared = warpX * warpX + warpZ * warpZ;
-			if (destinationDistanceSquared < 500 && warpDistanceSquared > 20000) {
+			if (destinationDistanceSquared < 500 && warpDistanceSquared > 20000 && !vars.isLoadingOld) {
 				return true;
 			}
 		}
 	
 		// Button 1
 		if (settings["b2Button1"]) {
-			if (vars.b2button.Old == 1 && vars.b2button.Current == 0) {
+			if (current.b2button > old.b2button) {
 				if (old.x > 2350 && current.x < 3000 && current.z > 10200 && current.z < 10550 && current.y > 1110) {
 					return true;
 				}
