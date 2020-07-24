@@ -48,6 +48,7 @@ state("Titanfall2") {
 }
 
 startup {
+	settings.Add("altTabPauseRemove", false, "Modify the game to make it not pause when alt tabbed");
 	settings.Add("flagSplit", false, "Start timer on flag pickup, split on flag capture, and pause when not holding flag (multiplayer)");
 	settings.Add("levelChangeSplit", true, "Split on level change");
 	settings.Add("helmetSplit", false, "Split on helmet pickup");
@@ -123,6 +124,8 @@ init {
 	
 	vars.resetLock = false;
 	vars.wishReset = false;
+	
+	vars.altTabPauseRemoved = false;
 }
 
 start {
@@ -177,6 +180,29 @@ start {
 }
 
 update {
+
+	if (settings["altTabPauseRemove"]) {
+		var deepClient = new DeepPointer("engine.dll", 0x1A1B04, new int[] {  });
+		IntPtr pointerClient;
+		deepClient.DerefOffsets(game, out pointerClient);
+		game.WriteBytes(pointerClient, new byte[] { 0x88, 0xA1 });
+
+		var deepServer = new DeepPointer("engine.dll", 0x1C8C02, new int[] { });
+		IntPtr pointerServer;
+		deepServer.DerefOffsets(game, out pointerServer);
+		game.WriteBytes(pointerServer, new byte[] { 0xEB });
+	} else {
+		var deepClient = new DeepPointer("engine.dll", 0x1A1B04, new int[] {  });
+		IntPtr pointerClient;
+		deepClient.DerefOffsets(game, out pointerClient);
+		game.WriteBytes(pointerClient, new byte[] { 0x88, 0x81 });
+
+		var deepServer = new DeepPointer("engine.dll", 0x1C8C02, new int[] { });
+		IntPtr pointerServer;
+		deepServer.DerefOffsets(game, out pointerServer);
+		game.WriteBytes(pointerServer, new byte[] { 0x75 });
+	}
+
 	if (vars.isLoading) {
 		vars.splitTimer = 0;
 	}
