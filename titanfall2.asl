@@ -48,7 +48,7 @@ state("Titanfall2") {
 }
 
 startup {
-	settings.Add("altTabPauseRemove", false, "Modify the game to make it not pause when alt tabbed");
+	settings.Add("altTabPauseRemove", false, "Modify the game to make it not pause when alt tabbed (not currently allowed in runs)");
 	settings.Add("flagSplit", false, "Start timer on flag pickup, split on flag capture, and pause when not holding flag (multiplayer)");
 	settings.Add("levelChangeSplit", true, "Split on level change");
 	settings.Add("helmetSplit", false, "Split on helmet pickup");
