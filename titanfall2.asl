@@ -48,13 +48,12 @@ state("Titanfall2") {
 }
 
 startup {
-	settings.Add("altTabPauseRemove", false, "Modify the game to make it not pause when alt tabbed (not currently allowed in runs)");
+	settings.Add("altTabPauseRemove", false, "Modify the game to make it not pause when alt tabbed");
 	settings.Add("flagSplit", false, "Start timer on flag pickup, split on flag capture, and pause when not holding flag (multiplayer)");
 	settings.Add("levelChangeSplit", true, "Split on level change");
 	settings.Add("helmetSplit", false, "Split on helmet pickup");
 	settings.Add("endSplit", true, "Split at the end of escape (end of run)");
 	settings.Add("removeLoads", true, "Remove Loads");
-	settings.Add("ignoreArk", false, "Ignore Ark Level Change Split (For Speedmod)");
 	
 	settings.Add("btSplits", false, "BT-7274");
 	settings.Add("btBattery1", true, "Split on first battery", "btSplits");
@@ -124,8 +123,6 @@ init {
 	
 	vars.resetLock = false;
 	vars.wishReset = false;
-	
-	vars.altTabPauseRemoved = false;
 }
 
 start {
@@ -265,7 +262,6 @@ split {
 	
 	//Level change
 	if (current.level != old.level && settings["levelChangeSplit"]) {
-		if (current.level == "sp_s2s" && settings["ignoreArk"]) return false;
 		return true;
 	}
 	
