@@ -128,6 +128,12 @@ init {
 start {
 	if (settings["flagSplit"] && old.flag == 0 && current.flag == 1) return true;
 	if (old.clframes <= 0 && current.clframes > 0) {
+		//Speedmod
+		var x = -7573 - current.x;
+		var z = 375 - current.z;
+		var distanceSquared = x * x + z * z;
+		if (current.level == "sp_training" && distanceSquared < 10)
+			return true;
 		//Pilots Gauntlet
 		if (current.level == "sp_training" && old.x > 10600 && old.x < 10700 && old.z > -10300 && old.z < -10100)
 			return true;
